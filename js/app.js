@@ -93,10 +93,42 @@ class CalorieTracker {
   }
 }
 
-const tracker = new CalorieTracker();
+class App {
+  constructor() {
+    this._tracker = new CalorieTracker();
+    document
+      .getElementById('meal-form')
+      .addEventListener('submit', this._newItem.bind(this, 'meal'));
+    document
+      .getElementById('workout-form')
+      .addEventListener('submit', this._newItem.bind(this, 'workout'));
+  }
+  _newItem(type, e) {
+    e.preventDefault();
+    const name = document.getElementById(`${type}-name`);
+    const calories = document.getElementById(`${type}-calories`);
 
-const breakfast = new Meal('Breakfast', 1900);
-tracker.addMeal(breakfast);
+    // Validate Inputs
+    if (name.value === '' || calories.value === '') {
+      alert('Please fill in all fields');
+      return;
+    }
+    if (type === 'meal') {
+      const meal = new Meal(name.value, Number(calories.value));
+      this._tracker.addMeal(meal);
+    } else {
+      const workout = new Workout(name.value, Number(calories.value));
+      this._tracker.addWorkout(workout);
+    }
 
-const run = new Workout('Morning Run', 400);
-tracker.addWorkout(run);
+    const collapseItem = document.getElementById(`collapse-${type}`);
+    const bsCollapse = new bootstrap.Collapse(collapseItem, {
+      toggle: true,
+    });
+
+    name.value = '';
+    calories.value = '';
+  }
+}
+
+const app = new App();
